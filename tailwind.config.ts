@@ -13,6 +13,10 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        display: ['Fredoka', 'sans-serif'],
+        body: ['Comic Neue', 'cursive'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -46,6 +50,11 @@ export default {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
+        },
+        cursed: {
+          pink: "hsl(var(--cursed-pink))",
+          yellow: "hsl(var(--cursed-yellow))",
+          blue: "hsl(var(--cursed-blue))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
