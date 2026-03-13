@@ -82,7 +82,7 @@ const Index = () => {
             <div className="w-9 h-9 bg-primary rounded-lg flex items-center justify-center">
               <Car size={20} className="text-primary-foreground" />
             </div>
-            <h1 className="font-display text-xl text-foreground">RideElite</h1>
+            <h1 className="font-display text-xl text-foreground">GoodRide</h1>
           </div>
           <button
             onClick={() => setShowHistory(!showHistory)}
