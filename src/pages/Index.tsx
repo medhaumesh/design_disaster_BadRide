@@ -1,20 +1,31 @@
 import { useState } from "react";
-import CursedProgressBar from "@/components/CursedProgressBar";
-import ScrambledKeyboard from "@/components/ScrambledKeyboard";
-import RunAwayRideCard from "@/components/RunAwayRideCard";
-import MathCaptcha from "@/components/MathCaptcha";
-import DodgyButton from "@/components/DodgyButton";
-import EvilCheckbox from "@/components/EvilCheckbox";
-import SpinToSelectPayment from "@/components/SpinToSelectPayment";
-import ConfirmationHell from "@/components/ConfirmationHell";
+import { ArrowRight, History, Car } from "lucide-react";
+import LocationInput from "@/components/LocationInput";
+import RideOption, { type RideType } from "@/components/RideOption";
+import BookingSteps from "@/components/BookingSteps";
+import PaymentMethod, { type PaymentOption } from "@/components/PaymentMethod";
+import DriverCard from "@/components/DriverCard";
+import BookingHistory, { type PastBooking } from "@/components/BookingHistory";
 
-const TOTAL_STEPS = 7;
+const STEPS = ["Location", "Ride", "Payment", "Confirm"];
 
-const rides = [
-  { name: "Economy (Donkey)", price: "¤∞.99/parsec", emoji: "🫏", difficulty: 3 },
-  { name: "Premium (Slightly Faster Donkey)", price: "√(-1) coins", emoji: "🐴", difficulty: 5 },
-  { name: "Luxury (Horse with Hat)", price: "Your firstborn", emoji: "🎩", difficulty: 7 },
-  { name: "VIP (Invisible Car)", price: "404 price not found", emoji: "👻", difficulty: 10 },
+const rideTypes: RideType[] = [
+  { id: "economy", name: "Economy", description: "Affordable everyday rides", price: "$8.50", eta: "3 min", capacity: 4, icon: "🚗" },
+  { id: "comfort", name: "Comfort", description: "Newer cars with extra legroom", price: "$12.00", eta: "5 min", capacity: 4, icon: "🚙" },
+  { id: "premium", name: "Premium", description: "Luxury vehicles, top-rated drivers", price: "$22.00", eta: "7 min", capacity: 4, icon: "✨" },
+  { id: "xl", name: "XL", description: "Spacious rides for groups", price: "$18.50", eta: "8 min", capacity: 6, icon: "🚐" },
+];
+
+const paymentOptions: PaymentOption[] = [
+  { id: "card", name: "Credit Card", icon: "card", detail: "•••• 4242" },
+  { id: "wallet", name: "Digital Wallet", icon: "wallet", detail: "Apple Pay / Google Pay" },
+  { id: "cash", name: "Cash", icon: "cash", detail: "Pay driver directly" },
+];
+
+const sampleHistory: PastBooking[] = [
+  { id: "1", date: "Mar 12, 2026", pickup: "123 Main Street", dropoff: "Airport Terminal 1", price: "$24.50", ride: "Comfort", status: "completed" },
+  { id: "2", date: "Mar 10, 2026", pickup: "Central Station", dropoff: "Grand Hotel & Resort", price: "$12.00", ride: "Economy", status: "completed" },
+  { id: "3", date: "Mar 8, 2026", pickup: "City Mall", dropoff: "University Campus", price: "$8.50", ride: "Economy", status: "cancelled" },
 ];
 
 const Index = () => {
@@ -22,259 +33,266 @@ const Index = () => {
   const [pickup, setPickup] = useState("");
   const [dropoff, setDropoff] = useState("");
   const [selectedRide, setSelectedRide] = useState<string | null>(null);
-  const [mathSolved, setMathSolved] = useState(false);
-  const [termsAccepted, setTermsAccepted] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
+  const [selectedPayment, setSelectedPayment] = useState<string | null>(null);
   const [booked, setBooked] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
 
-  const nextStep = () => setStep(s => Math.min(s + 1, TOTAL_STEPS));
+  const canProceed = () => {
+    switch (step) {
+      case 0: return pickup.length > 0 && dropoff.length > 0;
+      case 1: return selectedRide !== null;
+      case 2: return selectedPayment !== null;
+      default: return true;
+    }
+  };
+
+  const handleNext = () => {
+    if (step < 3) setStep(step + 1);
+    else { setBooked(true); }
+  };
+
+  const handleBack = () => {
+    if (step > 0) setStep(step - 1);
+  };
+
+  const handleRebook = (booking: PastBooking) => {
+    setPickup(booking.pickup);
+    setDropoff(booking.dropoff);
+    setShowHistory(false);
+    setStep(1);
+  };
+
+  const resetBooking = () => {
+    setStep(0);
+    setPickup("");
+    setDropoff("");
+    setSelectedRide(null);
+    setSelectedPayment(null);
+    setBooked(false);
+  };
+
+  const selectedRideData = rideTypes.find((r) => r.id === selectedRide);
 
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-card border-b-2 border-border p-4 sticky top-0 z-50">
-        <div className="max-w-2xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-3xl animate-spin-slow">🚗</span>
-            <h1 className="font-display text-2xl text-foreground">
-              BadRide™
-            </h1>
+      <header className="bg-card border-b border-border sticky top-0 z-50">
+        <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 bg-primary rounded-lg flex items-center justify-center">
+              <Car size={20} className="text-primary-foreground" />
+            </div>
+            <h1 className="font-display text-xl text-foreground">RideElite</h1>
           </div>
-          <span className="text-sm text-muted-foreground font-body">
-            "We'll get you there... eventually"
-          </span>
+          <button
+            onClick={() => setShowHistory(!showHistory)}
+            className="flex items-center gap-1.5 text-sm font-body text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <History size={18} />
+            History
+          </button>
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto p-6 space-y-6">
-        {!booked && <CursedProgressBar step={step} totalSteps={TOTAL_STEPS} />}
-
-        {/* Step 0: Welcome with annoying popup */}
-        {step === 0 && (
-          <div className="text-center space-y-6">
-            <h2 className="font-display text-4xl text-foreground">
-              Welcome to BadRide™! 🎉
-            </h2>
-            <p className="text-lg text-muted-foreground font-body">
-              The world's most frustrating ride-booking experience.
-              <br />Please accept our 47-page terms of service to continue.
-            </p>
-            <div className="max-h-32 overflow-y-auto bg-muted rounded-lg p-4 text-left">
-              <p className="text-xs text-muted-foreground font-body leading-relaxed">
-                {Array(50).fill("By using BadRide™ you agree to sacrifice your sanity, patience, and possibly your will to live. Section 42.7b states that all rides may or may not arrive. The driver may be a sentient GPS error. Prices are calculated using ancient Sumerian mathematics and are subject to change based on the phase of the moon, your zodiac sign, and whether Mercury is in retrograde. No refunds except in seashells. ").join("")}
-              </p>
-            </div>
-            <EvilCheckbox
-              label="I have read and agree to the Terms of Suffering (you haven't, but check anyway)"
-              onChecked={() => setTermsAccepted(true)}
-            />
-            {termsAccepted && (
-              <DodgyButton onActualClick={nextStep} dodgeCount={3}>
-                Begin Your Journey 🚀
-              </DodgyButton>
-            )}
+      <main className="max-w-lg mx-auto px-4 py-6 space-y-6">
+        {/* History View */}
+        {showHistory && !booked && (
+          <div className="animate-fade-in">
+            <h2 className="font-display text-2xl text-foreground mb-4">Past Rides</h2>
+            <BookingHistory bookings={sampleHistory} onRebook={handleRebook} />
           </div>
         )}
 
-        {/* Step 1: Pickup location with scrambled keyboard */}
-        {step === 1 && (
-          <div className="space-y-6">
-            <h2 className="font-display text-2xl text-foreground text-center">
-              📍 Where are you? (Type it backwards)
-            </h2>
-            <p className="text-sm text-muted-foreground font-body text-center">
-              Use our patent-pending Scramble-Board™ to enter your location.
-              Keys rearrange after every press! Have fun! 😈
-            </p>
-            <ScrambledKeyboard
-              value={pickup}
-              onChange={setPickup}
-              label="Pickup Location (must be at least 5 characters)"
-            />
-            {pickup.length >= 5 && (
-              <DodgyButton onActualClick={nextStep} dodgeCount={2}>
-                Next: Drop-off Location →
-              </DodgyButton>
-            )}
-          </div>
-        )}
+        {/* Booking Flow */}
+        {!showHistory && !booked && (
+          <>
+            <BookingSteps currentStep={step} steps={STEPS} />
 
-        {/* Step 2: Drop-off location */}
-        {step === 2 && (
-          <div className="space-y-6">
-            <h2 className="font-display text-2xl text-foreground text-center">
-              🏁 Where are you going?
-            </h2>
-            <p className="text-sm text-muted-foreground font-body text-center">
-              Same keyboard, fresh randomization! You're welcome!
-            </p>
-            <ScrambledKeyboard
-              value={dropoff}
-              onChange={setDropoff}
-              label="Drop-off Location (also 5+ characters)"
-            />
-            {dropoff.length >= 5 && (
-              <DodgyButton onActualClick={nextStep} dodgeCount={3}>
-                Show Me Terrible Rides →
-              </DodgyButton>
-            )}
-          </div>
-        )}
-
-        {/* Step 3: Ride selection - cards run away */}
-        {step === 3 && (
-          <div className="space-y-6">
-            <h2 className="font-display text-2xl text-foreground text-center">
-              🚘 Select Your Ride (if you can catch it)
-            </h2>
-            <p className="text-sm text-muted-foreground font-body text-center">
-              Hover over a ride to see it flee in terror. Click enough times to catch it!
-            </p>
-            <div className="grid grid-cols-2 gap-4 min-h-[300px]">
-              {rides.map((ride) => (
-                <RunAwayRideCard
-                  key={ride.name}
-                  {...ride}
-                  onSelect={() => {
-                    setSelectedRide(ride.name);
-                    nextStep();
-                  }}
+            {/* Step 0: Location */}
+            {step === 0 && (
+              <div className="space-y-4 animate-fade-in">
+                <h2 className="font-display text-2xl text-foreground">
+                  Where to?
+                </h2>
+                <LocationInput
+                  label="Pickup"
+                  placeholder="Enter pickup location"
+                  value={pickup}
+                  onChange={setPickup}
+                  icon="pickup"
                 />
-              ))}
-            </div>
-          </div>
-        )}
+                <LocationInput
+                  label="Drop-off"
+                  placeholder="Enter destination"
+                  value={dropoff}
+                  onChange={setDropoff}
+                  icon="dropoff"
+                />
+              </div>
+            )}
 
-        {/* Step 4: Math puzzle to see price */}
-        {step === 4 && (
-          <div className="space-y-6">
-            <h2 className="font-display text-2xl text-foreground text-center">
-              💰 Solve This to See Your Price
-            </h2>
-            <p className="text-sm text-muted-foreground font-body text-center">
-              We hide prices behind math puzzles for "security reasons."
-              <br />
-              (30% chance it says wrong even when you're right!)
-            </p>
-            {!mathSolved ? (
-              <MathCaptcha
-                onSolved={() => setMathSolved(true)}
-                label="Solve to unlock your fare"
-              />
-            ) : (
-              <div className="text-center space-y-4">
-                <div className="bg-card border-2 border-primary rounded-xl p-6">
-                  <p className="font-display text-3xl text-foreground">
-                    Your fare: $
-                    {(Math.random() * 9999 + 1).toFixed(2)}
-                  </p>
-                  <p className="text-xs text-muted-foreground font-body mt-2">
-                    *Plus surge pricing (always surging), convenience fee, inconvenience fee,
-                    breathing-in-the-car fee, and existential-dread tax.
-                  </p>
-                  <div className="mt-3 text-left text-sm font-body text-muted-foreground space-y-1">
-                    <p>Base fare: ${(Math.random() * 100).toFixed(2)}</p>
-                    <p>Surge (☀️ it's sunny): +${(Math.random() * 200).toFixed(2)}</p>
-                    <p>Having-a-name fee: +${(Math.random() * 50).toFixed(2)}</p>
-                    <p>Existing surcharge: +${(Math.random() * 75).toFixed(2)}</p>
-                    <p>Round number penalty: +${(Math.random() * 30).toFixed(2)}</p>
+            {/* Step 1: Ride Selection */}
+            {step === 1 && (
+              <div className="space-y-3 animate-fade-in">
+                <h2 className="font-display text-2xl text-foreground">
+                  Choose your ride
+                </h2>
+                <p className="text-sm text-muted-foreground font-body">
+                  {pickup} → {dropoff}
+                </p>
+                {rideTypes.map((ride) => (
+                  <RideOption
+                    key={ride.id}
+                    ride={ride}
+                    selected={selectedRide === ride.id}
+                    onSelect={() => setSelectedRide(ride.id)}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Step 2: Payment */}
+            {step === 2 && (
+              <div className="space-y-4 animate-fade-in">
+                <h2 className="font-display text-2xl text-foreground">
+                  Payment
+                </h2>
+                {selectedRideData && (
+                  <div className="bg-secondary/60 rounded-lg p-4 space-y-2">
+                    <div className="flex justify-between text-sm font-body">
+                      <span className="text-muted-foreground">Ride fare</span>
+                      <span className="text-foreground font-medium">{selectedRideData.price}</span>
+                    </div>
+                    <div className="flex justify-between text-sm font-body">
+                      <span className="text-muted-foreground">Service fee</span>
+                      <span className="text-foreground font-medium">$1.50</span>
+                    </div>
+                    <div className="border-t border-border pt-2 flex justify-between font-body">
+                      <span className="font-medium text-foreground">Total</span>
+                      <span className="font-display text-lg text-foreground">
+                        ${(parseFloat(selectedRideData.price.slice(1)) + 1.5).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                )}
+                <PaymentMethod
+                  options={paymentOptions}
+                  selected={selectedPayment}
+                  onSelect={setSelectedPayment}
+                />
+              </div>
+            )}
+
+            {/* Step 3: Confirm */}
+            {step === 3 && (
+              <div className="space-y-4 animate-fade-in">
+                <h2 className="font-display text-2xl text-foreground">
+                  Confirm your ride
+                </h2>
+                <div className="bg-card border border-border rounded-xl p-5 space-y-3">
+                  <div className="flex items-center gap-3 text-sm font-body">
+                    <span className="text-success">●</span>
+                    <span className="text-foreground">{pickup}</span>
+                  </div>
+                  <div className="ml-1.5 border-l-2 border-dashed border-border h-4" />
+                  <div className="flex items-center gap-3 text-sm font-body">
+                    <span className="text-accent">●</span>
+                    <span className="text-foreground">{dropoff}</span>
                   </div>
                 </div>
-                <DodgyButton onActualClick={nextStep} dodgeCount={4}>
-                  Sure, Whatever, Continue →
-                </DodgyButton>
+
+                {selectedRideData && (
+                  <div className="bg-card border border-border rounded-xl p-5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">{selectedRideData.icon}</span>
+                        <div>
+                          <p className="font-body font-medium text-foreground">{selectedRideData.name}</p>
+                          <p className="text-xs text-muted-foreground font-body">ETA: {selectedRideData.eta}</p>
+                        </div>
+                      </div>
+                      <span className="font-display text-xl text-foreground">
+                        ${(parseFloat(selectedRideData.price.slice(1)) + 1.5).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-3">
+                  <span className="text-muted-foreground font-body text-sm">Paying with</span>
+                  <span className="font-body font-medium text-foreground text-sm">
+                    {paymentOptions.find((p) => p.id === selectedPayment)?.name}
+                  </span>
+                </div>
               </div>
             )}
-          </div>
+
+            {/* Navigation Buttons */}
+            <div className="flex gap-3 pt-2">
+              {step > 0 && (
+                <button
+                  onClick={handleBack}
+                  className="flex-1 py-3 rounded-lg border border-border text-foreground font-body font-medium text-sm hover:bg-secondary transition-colors"
+                >
+                  Back
+                </button>
+              )}
+              <button
+                onClick={handleNext}
+                disabled={!canProceed()}
+                className="flex-1 py-3 rounded-lg bg-primary text-primary-foreground font-body font-medium text-sm hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {step === 3 ? "Confirm Booking" : "Continue"}
+                <ArrowRight size={16} />
+              </button>
+            </div>
+          </>
         )}
 
-        {/* Step 5: Payment wheel */}
-        {step === 5 && (
-          <div className="space-y-6">
-            <h2 className="font-display text-2xl text-foreground text-center">
-              💳 Payment Method
-            </h2>
-            <SpinToSelectPayment
-              onSelected={(method) => {
-                setPaymentMethod(method);
-                nextStep();
-              }}
-            />
-          </div>
-        )}
-
-        {/* Step 6: Confirmation hell */}
-        {step === 6 && (
-          <div className="space-y-6">
-            <h2 className="font-display text-2xl text-foreground text-center">
-              ✅ Final Confirmation
-            </h2>
-            <p className="text-sm text-muted-foreground font-body text-center">
-              Just a few quick confirmations... (Yes and No might be swapped)
-            </p>
-            <ConfirmationHell onConfirmed={() => { nextStep(); setBooked(true); }} />
-          </div>
-        )}
-
-        {/* Step 7: "Booked" - driver info is terrible */}
+        {/* Booking Confirmed */}
         {booked && (
-          <div className="space-y-6 text-center">
-            <div className="text-6xl">🎊</div>
-            <h2 className="font-display text-3xl text-foreground">
-              Ride Booked!*
-            </h2>
-            <p className="text-xs text-muted-foreground font-body">
-              *"Booked" is a strong word. "Vaguely acknowledged" is more accurate.
-            </p>
-
-            <div className="bg-card border-2 border-border rounded-xl p-6 space-y-4 text-left">
-              <h3 className="font-display text-lg text-foreground">Your Driver:</h3>
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center text-2xl"
-                  style={{ filter: "blur(8px)" }}>
-                  👤
-                </div>
-                <div>
-                  <p className="font-body text-foreground" style={{ transform: "scaleX(-1)", display: "inline-block" }}>
-                    ████ ███████
-                  </p>
-                  <p className="text-sm text-muted-foreground font-body">
-                    Rating: ⭐ (out of ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐)
-                  </p>
-                </div>
+          <div className="space-y-5 animate-fade-in">
+            <div className="text-center space-y-2">
+              <div className="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mx-auto">
+                <span className="text-3xl">✓</span>
               </div>
+              <h2 className="font-display text-2xl text-foreground">Ride Confirmed</h2>
+              <p className="text-sm text-muted-foreground font-body">
+                Your driver is on the way
+              </p>
+            </div>
 
-              <div className="space-y-2 text-sm font-body text-muted-foreground">
-                <p>🚗 Vehicle: Probably a car (color: yes)</p>
-                <p>📍 Pickup: {pickup || "Somewhere nearby-ish"}</p>
-                <p>🏁 Drop-off: {dropoff || "We'll figure it out"}</p>
-                <p>🎫 Ride: {selectedRide || "Mystery ride"}</p>
-                <p>💳 Paying with: {paymentMethod || "Unknown"}</p>
-                <p>⏰ ETA: Between now and heat death of the universe</p>
-                <p>📞 Contact driver: Phone number is upside down → ∂ƖƐ9-ϛ8Ɫ-00Ɛ</p>
+            <DriverCard
+              name="Marcus Johnson"
+              photo="👨‍✈️"
+              rating={4.9}
+              trips={2847}
+              vehicle="Toyota Camry 2024 · Black"
+              plate="ABC 1234"
+              eta={selectedRideData?.eta || "5 min"}
+            />
+
+            <div className="bg-card border border-border rounded-xl p-4 space-y-2">
+              <div className="flex items-center gap-3 text-sm font-body">
+                <span className="text-success">●</span>
+                <span className="text-foreground">{pickup}</span>
+              </div>
+              <div className="ml-1.5 border-l-2 border-dashed border-border h-3" />
+              <div className="flex items-center gap-3 text-sm font-body">
+                <span className="text-accent">●</span>
+                <span className="text-foreground">{dropoff}</span>
               </div>
             </div>
 
-            <div className="bg-muted rounded-xl p-4">
-              <p className="font-display text-foreground text-sm">
-                Thank you for using BadRide™! 
-              </p>
-              <p className="font-body text-muted-foreground text-xs mt-1">
-                Your feedback is important to us and will be promptly ignored.
-              </p>
-            </div>
+            <button
+              onClick={resetBooking}
+              className="w-full py-3 rounded-lg border border-border text-foreground font-body font-medium text-sm hover:bg-secondary transition-colors"
+            >
+              Book Another Ride
+            </button>
           </div>
         )}
       </main>
-
-      {/* Footer */}
-      <footer className="border-t border-border p-4 text-center mt-12">
-        <p className="text-xs text-muted-foreground font-body">
-          © 2026 BadRide™ Inc. All rights reversed. | 
-          <span className="cursor-none-important"> Privacy Policy</span> (there is none) | 
-          Help Center (closed permanently)
-        </p>
-      </footer>
     </div>
   );
 };
