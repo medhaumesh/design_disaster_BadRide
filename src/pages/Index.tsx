@@ -23,9 +23,9 @@ const paymentOptions: PaymentOption[] = [
 ];
 
 const sampleHistory: PastBooking[] = [
-  { id: "1", date: "Mar 12, 2026", pickup: "123 Main Street", dropoff: "Airport Terminal 1", price: "$24.50", ride: "Comfort", status: "completed" },
-  { id: "2", date: "Mar 10, 2026", pickup: "Central Station", dropoff: "Grand Hotel & Resort", price: "$12.00", ride: "Economy", status: "completed" },
-  { id: "3", date: "Mar 8, 2026", pickup: "City Mall", dropoff: "University Campus", price: "$8.50", ride: "Economy", status: "cancelled" },
+  { id: "1", date: "Mar 12, 2026", pickup: "Koramangala, 4th Block", dropoff: "Kempegowda International Airport", price: "₹850", ride: "Comfort", status: "completed" },
+  { id: "2", date: "Mar 10, 2026", pickup: "Majestic Bus Station", dropoff: "Whitefield, ITPL Main Road", price: "₹420", ride: "Economy", status: "completed" },
+  { id: "3", date: "Mar 8, 2026", pickup: "MG Road", dropoff: "Electronic City, Phase 1", price: "₹350", ride: "Economy", status: "cancelled" },
 ];
 
 const Index = () => {

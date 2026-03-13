@@ -10,16 +10,16 @@ interface Props {
 }
 
 const suggestions = [
-  "123 Main Street, Downtown",
-  "Airport Terminal 1",
-  "Central Station",
-  "Grand Hotel & Resort",
-  "City Mall, 5th Avenue",
-  "University Campus, Block A",
-  "Riverside Park Entrance",
-  "Business District, Tower 3",
-  "Harbor View Restaurant",
-  "Memorial Hospital",
+  "Kempegowda International Airport, Devanahalli",
+  "Majestic Bus Station, Bengaluru",
+  "Koramangala, 4th Block",
+  "Indiranagar, 100 Feet Road",
+  "Whitefield, ITPL Main Road",
+  "Electronic City, Phase 1",
+  "MG Road, Brigade Road Junction",
+  "Jayanagar, 4th Block",
+  "HSR Layout, Sector 1",
+  "Hebbal Flyover, Outer Ring Road",
 ];
 
 const LocationInput = ({ label, placeholder, value, onChange, icon = "pickup" }: Props) => {
