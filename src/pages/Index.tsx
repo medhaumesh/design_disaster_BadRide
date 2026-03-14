@@ -10,10 +10,10 @@ import BookingHistory, { type PastBooking } from "@/components/BookingHistory";
 const STEPS = ["Location", "Ride", "Payment", "Confirm"];
 
 const rideTypes: RideType[] = [
-  { id: "economy", name: "Economy", description: "Affordable everyday rides", price: "$8.50", eta: "3 min", capacity: 4, icon: "🚗" },
-  { id: "comfort", name: "Comfort", description: "Newer cars with extra legroom", price: "$12.00", eta: "5 min", capacity: 4, icon: "🚙" },
-  { id: "premium", name: "Premium", description: "Luxury vehicles, top-rated drivers", price: "$22.00", eta: "7 min", capacity: 4, icon: "✨" },
-  { id: "xl", name: "XL", description: "Spacious rides for groups", price: "$18.50", eta: "8 min", capacity: 6, icon: "🚐" },
+  { id: "economy", name: "Economy", description: "Affordable everyday rides", price: "₹85", eta: "3 min", capacity: 4, icon: "🚗" },
+  { id: "comfort", name: "Comfort", description: "Newer cars with extra legroom", price: "₹120", eta: "5 min", capacity: 4, icon: "🚙" },
+  { id: "premium", name: "Premium", description: "Luxury vehicles, top-rated drivers", price: "₹220", eta: "7 min", capacity: 4, icon: "✨" },
+  { id: "xl", name: "XL", description: "Spacious rides for groups", price: "₹185", eta: "8 min", capacity: 6, icon: "🚐" },
 ];
 
 const paymentOptions: PaymentOption[] = [
@@ -165,12 +165,12 @@ const Index = () => {
                     </div>
                     <div className="flex justify-between text-sm font-body">
                       <span className="text-muted-foreground">Service fee</span>
-                      <span className="text-foreground font-medium">$1.50</span>
+                      <span className="text-foreground font-medium">₹15</span>
                     </div>
                     <div className="border-t border-border pt-2 flex justify-between font-body">
                       <span className="font-medium text-foreground">Total</span>
                       <span className="font-display text-lg text-foreground">
-                        ${(parseFloat(selectedRideData.price.slice(1)) + 1.5).toFixed(2)}
+                        ₹{parseFloat(selectedRideData.price.slice(1)) + 15}
                       </span>
                     </div>
                   </div>
@@ -212,7 +212,7 @@ const Index = () => {
                         </div>
                       </div>
                       <span className="font-display text-xl text-foreground">
-                        ${(parseFloat(selectedRideData.price.slice(1)) + 1.5).toFixed(2)}
+                        ₹{parseFloat(selectedRideData.price.slice(1)) + 15}
                       </span>
                     </div>
                   </div>
