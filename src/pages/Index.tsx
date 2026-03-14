@@ -10,10 +10,10 @@ import BookingHistory, { type PastBooking } from "@/components/BookingHistory";
 const STEPS = ["Location", "Ride", "Payment", "Confirm"];
 
 const rideTypes: RideType[] = [
-  { id: "economy", name: "Economy", description: "Affordable everyday rides", price: "$8.50", eta: "3 min", capacity: 4, icon: "🚗" },
-  { id: "comfort", name: "Comfort", description: "Newer cars with extra legroom", price: "$12.00", eta: "5 min", capacity: 4, icon: "🚙" },
-  { id: "premium", name: "Premium", description: "Luxury vehicles, top-rated drivers", price: "$22.00", eta: "7 min", capacity: 4, icon: "✨" },
-  { id: "xl", name: "XL", description: "Spacious rides for groups", price: "$18.50", eta: "8 min", capacity: 6, icon: "🚐" },
+  { id: "economy", name: "Economy", description: "Affordable everyday rides", price: "₹85", eta: "3 min", capacity: 4, icon: "🚗" },
+  { id: "comfort", name: "Comfort", description: "Newer cars with extra legroom", price: "₹120", eta: "5 min", capacity: 4, icon: "🚙" },
+  { id: "premium", name: "Premium", description: "Luxury vehicles, top-rated drivers", price: "₹220", eta: "7 min", capacity: 4, icon: "✨" },
+  { id: "xl", name: "XL", description: "Spacious rides for groups", price: "₹185", eta: "8 min", capacity: 6, icon: "🚐" },
 ];
 
 const paymentOptions: PaymentOption[] = [
