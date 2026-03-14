@@ -212,7 +212,7 @@ const Index = () => {
                         </div>
                       </div>
                       <span className="font-display text-xl text-foreground">
-                        ${(parseFloat(selectedRideData.price.slice(1)) + 1.5).toFixed(2)}
+                        ₹{parseFloat(selectedRideData.price.slice(1)) + 15}
                       </span>
                     </div>
                   </div>
